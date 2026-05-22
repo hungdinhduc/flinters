@@ -1,0 +1,59 @@
+version: "3.8"
+
+services:
+
+  mariadb:
+    image: mariadb:11
+    container_name: mariadb
+
+    restart: always
+
+    environment:
+      MARIADB_ROOT_PASSWORD: 123456
+      MARIADB_DATABASE: demo
+
+    ports:
+      - "3306:3306"
+
+    volumes:
+      - mariadb_data:/var/lib/mysql
+
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb-admin ping -h localhost -p123456 || exit 1"]
+      interval: 5s   # Giảm xuống 5s để check nhanh hơn
+      timeout: 3s
+      retries: 5
+      start_period: 10s # Thêm dòng này: Cho MariaDB 10 giây để "khởi động" trước khi bắt đầu tính lỗi
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: campaign-app
+
+    restart: always
+
+    depends_on:
+      mariadb:
+        condition: service_healthy
+
+    environment:
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_NAME: demo
+      DB_USERNAME: root
+      DB_PASSWORD: 123456
+      EXPORT_PATH: /app/output
+
+    ports:
+      - "8080:8080"
+
+    volumes:
+      - ./output:/app/output
+
+    command: ["java", "-jar", "app.jar"]
+
+
+volumes:
+  mariadb_data:
