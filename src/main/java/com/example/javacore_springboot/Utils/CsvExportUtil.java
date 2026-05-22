@@ -14,7 +14,11 @@ public class CsvExportUtil {
             String fileName
     ) {
 
-        String exportDir = System.getenv("EXPORT_PATH");;
+        String exportDir = System.getenv("EXPORT_PATH");
+
+        if (exportDir == null || exportDir.isBlank()) {
+            throw new IllegalArgumentException("EXPORT_PATH is missing");
+        }
 
         // tạo thư mục nếu chưa tồn tại
         File dir = new File(exportDir);
@@ -50,6 +54,8 @@ public class CsvExportUtil {
              * Data
              */
             for (CampaignSummary item : data) {
+
+                if (item == null) continue;
 
                 String[] row = {
 
