@@ -26,6 +26,10 @@ public class Application implements CommandLineRunner {
 
 		List<CampaignSummary> ctrTop10 = exportTop10ByHighestCtr();
 		List<CampaignSummary> cpaTop10 = exportTop10ByLowestCpa();
+
+		if (ctrTop10 == null || ctrTop10.isEmpty()) throw new IllegalStateException("CTR empty");
+		if (cpaTop10 == null || cpaTop10.isEmpty()) throw new IllegalStateException("CPA empty");
+
 		System.out.println("hungd27 check:" + ctrTop10);
 		System.out.println("hungd27 check:" + cpaTop10);
 
